@@ -15,7 +15,7 @@ Kindlegen needs to be placed under the / bin directory of the same level of the 
 [kindlegen Official download](https://www.amazon.com/gp/feature.html?docId=1000765211)
 
 ## Generate epub
-nothing
+Nothing
 
 ## Generate txt
 TxtWriter
