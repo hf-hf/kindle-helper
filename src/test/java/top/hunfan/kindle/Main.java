@@ -41,13 +41,13 @@ public class Main {
         chapterInfo2.setTitle("几个词语的诠释");
         ChapterInfo[] chapterInfoArr = new ChapterInfo[]{chapterInfo, chapterInfo2};
         book.setChapters(chapterInfoArr);
-        URL coverUrl = new URL("https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/f11f3a292df5e0fed876f346546034a85edf720e.jpg");
+        URL coverUrl = new URL("https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike116%2C5%2C5%2C116%2C38/sign=9ac47a15aa8b87d6444fa34d6661435d/908fa0ec08fa513d0f4fa4fa366d55fbb2fbd929.jpg");
         Writer writer = new MobiWriter(coverUrl);
         writer.generate(book, "D:\\tmp3");
     }
 
     private static void downloadCoverImage() throws IOException {
-        String url2 = "https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1548817441&di=4f1d901952a34cf6393648b0920ab854&src=http://photos.tuchong.com/58119/f/2070974.jpg";
+        String url2 = "https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike116%2C5%2C5%2C116%2C38/sign=9ac47a15aa8b87d6444fa34d6661435d/908fa0ec08fa513d0f4fa4fa366d55fbb2fbd929.jpg";
         URL url = new URL(url2);
         IOUtils.write(url.openStream(), new FileOutputStream(new File("D:\\cover.jpg")));
     }
