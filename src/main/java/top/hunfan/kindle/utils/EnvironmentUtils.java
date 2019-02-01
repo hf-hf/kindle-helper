@@ -9,11 +9,15 @@ import java.util.Properties;
  */
 public class EnvironmentUtils {
 
+    private static final String ENV_LINUX = "linux";
+
+    private static final String ENV_WIN = "win";
+
     public static boolean isOSLinux() {
         Properties prop = System.getProperties();
 
         String os = prop.getProperty("os.name");
-        if (os != null && os.toLowerCase().indexOf("linux") > -1) {
+        if (os != null && os.toLowerCase().indexOf(ENV_LINUX) > -1) {
             return true;
         } else {
             return false;
@@ -24,7 +28,7 @@ public class EnvironmentUtils {
         Properties prop = System.getProperties();
 
         String os = prop.getProperty("os.name");
-        if (os != null && os.toLowerCase().startsWith("win")) {
+        if (os != null && os.toLowerCase().startsWith(ENV_WIN)) {
             return true;
         } else {
             return false;

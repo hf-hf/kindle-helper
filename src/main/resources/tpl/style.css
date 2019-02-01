@@ -11,20 +11,7 @@ p {
     widows: 0;
 }
 
-div.centeredimage {
-    text-align: center;
-    display: block;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
-img.attpic {
-    border: 1px solid #000000;
-    /*max-width: 100%;*/
-    margin: 0;
-}
-
-.booktitle {
+.title {
     margin-top: 30%;
     margin-bottom: 0;
     border-style: none solid none none;
@@ -35,7 +22,7 @@ img.attpic {
     text-align: right;
 }
 
-.bookauthor {
+.author {
     margin-top: 0;
     border-style: none solid none none;
     border-width: 50px;
@@ -47,7 +34,7 @@ img.attpic {
 }
 
 @media not amzn-mobi {
-    .titletoc, .titlel1top, .titlel1std, .titlel2top, .titlel2std, .titlel3top, .titlel3std, .titlel4std {
+    .title-toc, .title-std {
         margin-top: 0;
         margin-bottom: 1.2em;
         border-style: none none dotted none;
@@ -59,32 +46,14 @@ img.attpic {
         text-align: center;
         text-shadow: 1px 1px 1px #333;
     }
-
-    .titlel1single, .titlel2single, .titlel3single {
-        margin-top: 35%;
-        border-style: none solid none none;
-        border-width: 30px;
-        border-color: #4E594D;
-        padding: 30px 5px 5px 5px;
-        font-size: x-large;
-        line-height: 110%;
-        text-align: right;
-    }
 }
 
 @media amzn-mobi {
-    .titletoc, .titlel1top, .titlel1std, .titlel2top, .titlel2std, .titlel3top, .titlel3std, .titlel4std {
+    .title-toc, .title-std {
         margin-top: 0;
         padding-top: 20px;
         font-size: x-large;
         line-height: 125%;
-        text-align: center;
-    }
-
-    .titlel1single, .titlel2single, .titlel3single {
-        margin-top: 35%;
-        line-height: 110%;
-        font-size: x-large;
         text-align: center;
     }
 }
@@ -101,57 +70,10 @@ img.attpic {
     color: #000000;
 }
 
-.tocl1 {
-    margin-top: 0.5em;
-    margin-left: -30px;
-    border-style: none double double solid;
-    border-width: 0px 5px 2px 20px;
-    border-color: #6B766A;
-    line-height: 135%;
-    font-size: 132%;
-}
-
-.tocl2 {
+.toc-dt {
     margin-top: 0.5em;
     margin-left: -20px;
     border-style: none none none none;
     line-height: 123%;
     font-size: 120%;
 }
-
-.tocl3 {
-    margin-top: 0.5em;
-    margin-left: -20px;
-    border-style: none double none solid;
-    border-width: 0px 2px 0px 8px;
-    border-color: #939E92;
-    line-height: 112%;
-    font-size: 109%;
-}
-
-.tocl4 {
-    margin-top: 0.5em;
-    margin-left: -20px;
-    border-style: none double none solid;
-    border-width: 0px 2px 0px 6px;
-    border-color: #939E92;
-    line-height: 115%;
-    font-size: 110%;
-}
-
-.subtoc {
-    margin-left: 15%;
-    padding: 0px;
-    text-align: justify;
-}
-
-.subtoclist {
-    margin-top: 0.5em;
-    margin-left: -20px;
-    border-style: none double none solid;
-    border-width: 0px 2px 0px 10px;
-    border-color: #939E92;
-    line-height: 123%;
-    font-size: 120%;
-}
-

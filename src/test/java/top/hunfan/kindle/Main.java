@@ -41,7 +41,8 @@ public class Main {
         chapterInfo2.setTitle("几个词语的诠释");
         ChapterInfo[] chapterInfoArr = new ChapterInfo[]{chapterInfo, chapterInfo2};
         book.setChapters(chapterInfoArr);
-        Writer writer = new MobiWriter();
+        URL coverUrl = new URL("https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/f11f3a292df5e0fed876f346546034a85edf720e.jpg");
+        Writer writer = new MobiWriter(coverUrl);
         writer.generate(book, "D:\\tmp3");
     }
 
