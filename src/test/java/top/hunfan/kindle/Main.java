@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Book book = new Book();
-        book.setAuthor("作者");
+        book.setAuthor("潘鸣啸（法）");
         book.setName("失落的一代");
         book.setId("B00T3XVB9E");
 
