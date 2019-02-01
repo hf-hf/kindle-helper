@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,18 +43,25 @@ public class MobiWriter implements Writer{
 
     private URL coverUrl;
 
-    private String kindlegenPath = "." + SeparatorUtils.getFileSeparator() + "bin" + SeparatorUtils.getFileSeparator();
+    private String kindlegenPath = "." + SeparatorUtils.getFileSeparator()
+            + "bin" + SeparatorUtils.getFileSeparator();
 
     private TemplateConfig config = new TemplateConfig();
 
-    public MobiWriter setKindlegenPath(String path) {
-        this.kindlegenPath = completingPath(path);
-        return this;
+    public MobiWriter() {
     }
 
-    public MobiWriter setCoverUrl(URL coverUrl) {
+    public MobiWriter(URL coverUrl) {
         this.coverUrl = coverUrl;
-        return this;
+    }
+
+    public MobiWriter(String kindlegenPath) {
+        this.kindlegenPath = kindlegenPath;
+    }
+
+    public MobiWriter(URL coverUrl, String kindlegenPath) {
+        this.coverUrl = coverUrl;
+        this.kindlegenPath = kindlegenPath;
     }
 
     private String completingPath(String path){
@@ -113,20 +121,28 @@ public class MobiWriter implements Writer{
         String content = CacheUtils.get("cover.html");
         content = content.replace("___BOOK_NAME___", book.name);
         content = content.replace("___BOOK_AUTHOR___", book.author);
-        //content = createCoverImage(content);
+        content = createCoverImage(content);
         IOUtils.write(content, path);
     }
 
     private String createCoverImage(String content){
-        if(null != this.coverUrl){
-            try {
-                IOUtils.write(this.coverUrl.openStream(),
-                        new FileOutputStream(new File(tempPath + "cover.jpg")));
-                content = content.replace("<!--", "");
-                content = content.replace("-->", "");
-            } catch (Exception e){
-                log.error("create cover.jpg error!", e);
-            }
+        if(null == this.coverUrl){
+            return content.replace("___BOOK_COVER___", "");
+        }
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = this.coverUrl.openStream();
+            os = new FileOutputStream(new File(this.tempPath + "cover.jpg"));
+            IOUtils.write(is, os);
+
+            content = content.replace("___BOOK_COVER___",
+                    "<img src=\"cover.jpg\" alt=\"cover\" style=\"height: 100%\"/>");
+        } catch (Exception e){
+            log.error("create cover.jpg error!", e);
+        } finally {
+            IOUtils.close(is);
+            IOUtils.close(os);
         }
         return content;
     }
@@ -167,7 +183,7 @@ public class MobiWriter implements Writer{
         String tocContent = "";
         for (int i = 0; i < book.getChapters().length; i++) {
             ChapterInfo chapter = book.chapters[i];
-            String tocLine = String.format("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\r\n",
+            String tocLine = String.format("<dt class=\"toc-dt\"><a href=\"chapter%d.html\">%s</a></dt>\r\n",
                     i, chapter.title);
             tocContent += tocLine;
         }
@@ -223,7 +239,7 @@ public class MobiWriter implements Writer{
         CacheUtils.put(config.getToc());
     }
 
-    private void exec(Book book, String savePath) {
+    public void exec(Book book, String savePath) {
         String cmdStr = String.format(PROCESS_CMD, kindlegenPath + getToolName(),
                 tempPath, endWithMobi(book.getName()));
         InputStream is = null;

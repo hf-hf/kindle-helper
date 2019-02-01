@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Book book = new Book();
-        book.setAuthor("作者");
+        book.setAuthor("潘鸣啸（法）");
         book.setName("失落的一代");
         book.setId("B00T3XVB9E");
 
@@ -41,7 +41,8 @@ public class Main {
         chapterInfo2.setTitle("几个词语的诠释");
         ChapterInfo[] chapterInfoArr = new ChapterInfo[]{chapterInfo, chapterInfo2};
         book.setChapters(chapterInfoArr);
-        Writer writer = new MobiWriter().setCoverUrl(new URL("https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1548817441&di=4f1d901952a34cf6393648b0920ab854&src=http://photos.tuchong.com/58119/f/2070974.jpg"));
+        URL coverUrl = new URL("https://gss0.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/f11f3a292df5e0fed876f346546034a85edf720e.jpg");
+        Writer writer = new MobiWriter(coverUrl);
         writer.generate(book, "D:\\tmp3");
     }
 

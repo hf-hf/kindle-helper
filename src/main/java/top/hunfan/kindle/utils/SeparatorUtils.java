@@ -6,20 +6,20 @@ package top.hunfan.kindle.utils;
 import java.util.Properties;
 
 /**
- * 
  * Separators.
- * 
- * @author jdzhan,2014-12-6
- * 
+ * @author hf-hf
+ * @date 2019/2/1 17:03
  */
 public class SeparatorUtils {
 
-	/* system properties to get separators */
+	/**
+	 * system properties to get separators
+	 */
 	static final Properties PROPERTIES = new Properties(System.getProperties());
 
 	/**
 	 * get line separator on current platform
-	 * 
+	 *
 	 * @return line separator
 	 */
 	public static String getLineSeparator() {
