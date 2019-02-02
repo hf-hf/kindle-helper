@@ -1,13 +1,10 @@
 package top.hunfan.kindle;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
 import top.hunfan.kindle.domain.Book;
 import top.hunfan.kindle.domain.ChapterInfo;
-import top.hunfan.kindle.utils.IOUtils;
 import top.hunfan.kindle.writer.MobiWriter;
 import top.hunfan.kindle.writer.Writer;
 
@@ -44,12 +41,6 @@ public class Main {
         URL coverUrl = new URL("https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike116%2C5%2C5%2C116%2C38/sign=9ac47a15aa8b87d6444fa34d6661435d/908fa0ec08fa513d0f4fa4fa366d55fbb2fbd929.jpg");
         Writer writer = new MobiWriter(coverUrl);
         writer.generate(book, "D:\\tmp3");
-    }
-
-    private static void downloadCoverImage() throws IOException {
-        String url2 = "https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike116%2C5%2C5%2C116%2C38/sign=9ac47a15aa8b87d6444fa34d6661435d/908fa0ec08fa513d0f4fa4fa366d55fbb2fbd929.jpg";
-        URL url = new URL(url2);
-        IOUtils.write(url.openStream(), new FileOutputStream(new File("D:\\cover.jpg")));
     }
 
 }
