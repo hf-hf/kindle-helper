@@ -259,10 +259,10 @@ public class MobiWriter implements Writer{
     }
 
     private String getToolName(){
-        if(EnvironmentUtils.isOSLinux()){
-            return "kindlegen";
-        } else {
+        if(EnvironmentUtils.isWindow()){
             return "kindlegen.exe";
+        } else {
+            return "kindlegen";
         }
     }
 
