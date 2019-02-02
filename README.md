@@ -29,7 +29,7 @@ kindle-helper通过一系列模板文件构建出生成书籍的 `.opf` 等文�
 ### 生成`.mobi`
 创建MobiWriter传入Book生成 `.mobi`，若要附带封面图片，请调用coverUrl参数的MobiWriter构造器，目前仅支持远程图片。
 
-## 生成`.txt`
+### 生成`.txt`
 创建TxtWriter传入Book生成 `.txt`。
 
 ## 运行截图
