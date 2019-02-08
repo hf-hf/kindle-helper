@@ -1,9 +1,11 @@
 package top.hunfan.kindle.writer;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -29,15 +31,13 @@ public class MobiWriter implements Writer{
 
     private static final Logger log = LoggerFactory.getLogger(MobiWriter.class);
 
-    private static final String PROCESS_CMD = "%s %scontent.opf -c1 -o %s";
+    private static final String PROCESS_CMD = "%s %scontent.opf -c1 -verbose -o %s";
 
     private static final String MOBI_PREFIX = ".mobi";
 
     private static final SimpleDateFormat format = new SimpleDateFormat("yyMMddHHmmss");
 
     private String tempPath;
-
-    private String mobiFileName;
 
     private File tempDirectory;
 
@@ -243,17 +243,28 @@ public class MobiWriter implements Writer{
         String cmdStr = String.format(PROCESS_CMD, kindlegenPath + getToolName(),
                 tempPath, endWithMobi(book.getName()));
         InputStream is = null;
+        BufferedReader br = null;
+        InputStreamReader isr = null;
+        String textLine = "";
         try {
             Process process = Runtime.getRuntime().exec(cmdStr);
             is = process.getInputStream();
-            String result = new String(IOUtils.read(process.getInputStream()));
-            log.debug(result);
+            isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
+            while ((textLine = br.readLine()) != null) {
+                if(0 != textLine.length()){
+                    log.debug(textLine);
+                }
+            }
+            log.debug("exec finish!");
             //移动生成的mobi到savePath
             IOUtils.copy(tempPath + endWithMobi(book.getName()),
                     savePath + endWithMobi(book.getName()));
         } catch (IOException e) {
             log.error("exec error!", e);
         } finally {
+            IOUtils.close(br);
+            IOUtils.close(isr);
             IOUtils.close(is);
         }
     }
