@@ -33,7 +33,7 @@ Create TxtWriter to pass in Book to generate `txt'.
 ## Run Screenshots
 ![demo](/images/demo.gif)
 
-## Code example
+## Code Example
 ```
 Book book = new Book();
 ChapterInfo chapterInfo = new ChapterInfo();
