@@ -66,3 +66,8 @@ Then add kindle-helper dependencies：
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
+
+## Update records
+
+- v0.0.1 supports the generation of `txt` and `mobi` e-books with cover and catalogue
+- v0.0.2 `mobi` supports the generation of graphic section; optimizes the generation of e-book style
