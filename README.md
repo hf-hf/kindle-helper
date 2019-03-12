@@ -68,3 +68,7 @@ writer.generate(book, "D:\\tmp3");
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
+
+## 更新记录
+- v0.0.1 支持生成`.txt`以及包含封面、目录的`.mobi`电子书
+- v0.0.2 `.mobi`支持图文章节生成；优化生成电子书样式
