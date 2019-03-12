@@ -725,4 +725,38 @@ public final class IOUtils {
         }
         dir.delete();
     }
+
+	/**
+	 * download file
+	 * @param url
+	 * @param path
+	 * @throws IOException
+	 */
+	public static void downloadFile(URL url, String path) throws IOException {
+		InputStream is = null;
+		OutputStream os = null;
+		try {
+			is = url.openStream();
+			os = new FileOutputStream(new File(path));
+			IOUtils.write(is, os);
+		} catch (Exception e){
+			throw e;
+		} finally {
+			IOUtils.close(is);
+			IOUtils.close(os);
+		}
+	}
+
+	/**
+	 * delete and create
+	 * @param path
+	 * @return
+	 */
+	public static File deleteAndCreate(String path){
+		File file = new File(path);
+		file.deleteOnExit();
+		file.mkdirs();
+		return file;
+	}
+
 }

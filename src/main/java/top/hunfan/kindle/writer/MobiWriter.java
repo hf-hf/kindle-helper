@@ -2,14 +2,13 @@ package top.hunfan.kindle.writer;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +20,7 @@ import top.hunfan.kindle.utils.CacheUtils;
 import top.hunfan.kindle.utils.EnvironmentUtils;
 import top.hunfan.kindle.utils.IOUtils;
 import top.hunfan.kindle.utils.SeparatorUtils;
+import top.hunfan.kindle.utils.StringUtils;
 
 /**
  * mobi文件生成
@@ -37,7 +37,11 @@ public class MobiWriter implements Writer{
 
     private static final SimpleDateFormat format = new SimpleDateFormat("yyMMddHHmmss");
 
+    private static final String IMAGES_DIR = "images"  + SeparatorUtils.getFileSeparator();
+
     private String tempPath;
+
+    private String tempImagesPath;
 
     private File tempDirectory;
 
@@ -73,11 +77,12 @@ public class MobiWriter implements Writer{
 
     private void createTempPath(String savePath){
         String tempPath = savePath + format.format(new Date()) + SeparatorUtils.getFileSeparator();
-        File tempDir = new File(tempPath);
-        tempDir.deleteOnExit();
-        tempDir.mkdirs();
+        File tempDir = IOUtils.deleteAndCreate(tempPath);
         this.tempPath = tempPath;
-        this.tempDirectory = tempDir;
+        this.tempDirectory= tempDir;
+        String tempImagesPath = tempPath + IMAGES_DIR;
+        File tempImagesDir = IOUtils.deleteAndCreate(tempImagesPath);
+        this.tempImagesPath = tempImagesPath;
     }
 
     @Override
@@ -129,24 +134,16 @@ public class MobiWriter implements Writer{
         if(null == this.coverUrl){
             return content.replace("___BOOK_COVER___", "");
         }
-        InputStream is = null;
-        OutputStream os = null;
         try {
-            is = this.coverUrl.openStream();
-            os = new FileOutputStream(new File(this.tempPath + "cover.jpg"));
-            IOUtils.write(is, os);
-
-            content = content.replace("___BOOK_COVER___",
-                    "<img src=\"cover.jpg\" alt=\"cover\" style=\"height: 100%\"/>");
-        } catch (Exception e){
+            IOUtils.downloadFile(this.coverUrl, this.tempPath + "cover.jpg");
+        } catch (IOException e) {
             log.error("create cover.jpg error!", e);
-        } finally {
-            IOUtils.close(is);
-            IOUtils.close(os);
+            return content.replace("___BOOK_COVER___", "");
         }
+        content = content.replace("___BOOK_COVER___",
+                "<img src=\"cover.jpg\" alt=\"cover\" style=\"height: 100%\"/>");
         return content;
     }
-
 
     private void createChapters(Book book) {
         for (int i = 0; i < book.getChapters().length; i++) {
@@ -156,19 +153,35 @@ public class MobiWriter implements Writer{
             content = content.replace("___CHAPTER_ID___", "Chapter " + i);
             content = content.replace("___CHAPTER_NAME___", chapter.title);
             String chapterContent = chapter.body;
-            chapterContent = chapterContent.replace("\r", "");
-            String[] ps = chapterContent.split("\n");
-            chapterContent = "";
-            for (String p : ps) {
-                String pStr = "<p class=\"a\">";
-                pStr += "　　" + p;
-                pStr += "</p>";
-                chapterContent += pStr;
-            }
+            //如果不包含html，切分段落
+            chapterContent = StringUtils.filterContent(chapterContent);
+            chapterContent = downloadChapterImages(chapterContent);
             content = content.replace("___CONTENT___", chapterContent);
             IOUtils.write(content, path);
         }
 
+    }
+
+    private String downloadChapterImages(String content) {
+        List<String> srcList = StringUtils.getImgSrc(content);
+        if(null == srcList || 0 > srcList.size()){
+            return content;
+        }
+        String src;
+        String name;
+        for (int i = 0;i < srcList.size(); i++) {
+            src = srcList.get(i);
+            name = StringUtils.getFileName(src);
+            try {
+                IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
+            } catch (IOException e) {
+                log.error("downloadFile error! url:" + src, e);
+                content = content.replace(src,"");
+                continue;
+            }
+            content = content.replace(src, IMAGES_DIR + name);
+        }
+        return content;
     }
 
     private void createStyle(Book book) {
