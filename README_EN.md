@@ -63,7 +63,7 @@ Then add kindle-helper dependencies：
 <dependency>
     <groupId>top.hunfan</groupId>
     <artifactId>kindle-helper</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
