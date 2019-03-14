@@ -16,7 +16,7 @@ pre {
     padding-left: 2em;
 }
 
-ul > li > p {
+li > p {
     text-indent: 0em;
 }
 
