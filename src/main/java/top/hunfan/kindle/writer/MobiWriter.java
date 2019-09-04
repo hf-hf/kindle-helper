@@ -47,6 +47,8 @@ public class MobiWriter implements Writer{
 
     private URL coverUrl;
 
+    private boolean debugMode = false;
+
     private String kindlegenPath = "." + SeparatorUtils.getFileSeparator()
             + "bin" + SeparatorUtils.getFileSeparator();
 
@@ -66,6 +68,11 @@ public class MobiWriter implements Writer{
     public MobiWriter(URL coverUrl, String kindlegenPath) {
         this.coverUrl = coverUrl;
         this.kindlegenPath = kindlegenPath;
+    }
+
+    public MobiWriter withDebugMode() {
+        this.debugMode = true;
+        return this;
     }
 
     private String completingPath(String path){
@@ -110,11 +117,13 @@ public class MobiWriter implements Writer{
         //生成
         exec(book, savePath);
         //清理临时文件夹
-        delelteTempDir();
+        deleteTempDir();
     }
 
-    private void delelteTempDir(){
-        IOUtils.delete(this.tempDirectory);
+    private void deleteTempDir(){
+        if(!this.debugMode){
+            IOUtils.delete(this.tempDirectory);
+        }
     }
 
     private String endWithMobi(String name){
