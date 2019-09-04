@@ -2,6 +2,7 @@ body {
     padding: 0;
     orphans: 0;
     widows: 0;
+	font: 300 1em/1.8 PingFang SC,Lantinghei SC,Microsoft Yahei,Hiragino Sans GB,Microsoft Sans Serif,WenQuanYi Micro Hei,Helvetica,sans-serif;
 }
 
 p {
@@ -10,10 +11,15 @@ p {
     orphans: 0;
     widows: 0;
     text-indent: 2em;
+	font-size: x-large;
 }
 
+img {
+	max-width: 100%;
+}
 pre {
     padding-left: 2em;
+	font-size: x-large;
 }
 
 li > p {
