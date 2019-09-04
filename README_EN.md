@@ -63,12 +63,6 @@ Then add kindle-helper dependencies：
 <dependency>
     <groupId>top.hunfan</groupId>
     <artifactId>kindle-helper</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
-
-## Update records
-
-- v0.0.1 supports the generation of `txt` and `mobi` e-books with cover and catalogue
-- v0.0.2 `mobi` supports the generation of graphic section; optimizes the generation of e-book style
-- v0.0.3 Optimize the style of e-book generation; add debug mode to support generation without deleting temporary directories; support excluding specified img tags during generation

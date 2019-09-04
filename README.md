@@ -65,11 +65,6 @@ writer.generate(book, "D:\\tmp3");
 <dependency>
     <groupId>top.hunfan</groupId>
     <artifactId>kindle-helper</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
-
-## 更新记录
-- v0.0.1 支持生成`.txt`以及包含封面、目录的`.mobi`电子书
-- v0.0.2 `.mobi`支持图文章节生成；优化生成电子书样式
-- v0.0.3 优化生成电子书样式；添加debug模式，支持生成后不删除生成临时目录；支持生成过程中排除指定的img标签
