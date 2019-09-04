@@ -7,8 +7,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import top.hunfan.kindle.config.TemplateConfig;
 import top.hunfan.kindle.domain.Book;
 import top.hunfan.kindle.domain.ChapterInfo;
+import top.hunfan.kindle.domain.ImgTag;
 import top.hunfan.kindle.utils.CacheUtils;
 import top.hunfan.kindle.utils.EnvironmentUtils;
 import top.hunfan.kindle.utils.IOUtils;
@@ -49,6 +54,10 @@ public class MobiWriter implements Writer{
 
     private boolean debugMode = false;
 
+    private boolean excludeImageFlag = false;
+
+    private Set<String> excludeImageNames;
+
     private String kindlegenPath = "." + SeparatorUtils.getFileSeparator()
             + "bin" + SeparatorUtils.getFileSeparator();
 
@@ -72,6 +81,18 @@ public class MobiWriter implements Writer{
 
     public MobiWriter withDebugMode() {
         this.debugMode = true;
+        return this;
+    }
+
+    public MobiWriter withExcludeImgUrl(String excludeImgUrl) {
+        return withExcludeImgUrl(Collections.singleton(excludeImgUrl));
+    }
+
+    public MobiWriter withExcludeImgUrl(Set<String> excludeImgUrls) {
+        this.excludeImageNames = excludeImgUrls.stream()
+                .map(StringUtils::getFileName)
+                .collect(Collectors.toSet());
+        this.excludeImageFlag = true;
         return this;
     }
 
@@ -172,15 +193,22 @@ public class MobiWriter implements Writer{
     }
 
     private String downloadChapterImages(String content) {
-        List<String> srcList = StringUtils.getImgSrc(content);
+        List<ImgTag> srcList = StringUtils.getImgTag(content);
         if(null == srcList || 0 > srcList.size()){
             return content;
         }
+        ImgTag imgTag;
         String src;
         String name;
         for (int i = 0;i < srcList.size(); i++) {
-            src = srcList.get(i);
+            imgTag = srcList.get(i);
+            src = imgTag.getSrc();
             name = StringUtils.getFileName(src);
+            if(this.excludeImageFlag
+                    && this.excludeImageNames.contains(name)){
+                content = content.replace(imgTag.getHtml(),"");
+                continue;
+            }
             try {
                 IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
             } catch (IOException e) {
