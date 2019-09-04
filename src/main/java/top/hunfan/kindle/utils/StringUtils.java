@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import top.hunfan.kindle.domain.ImgTag;
+
 /**
  * Provide some String operations.
  * @author hefan
@@ -41,6 +43,19 @@ public class StringUtils {
         while (mImgSrc.find()) {
             imgSrc = mImgSrc.group(1);
             result.add(imgSrc);
+        }
+        return result;
+    }
+
+    public static List<ImgTag> getImgTag(String content) {
+        List<ImgTag> result = new ArrayList<>();
+        Matcher mImgSrc = P_IMG_SRC.matcher(content);
+        String imgHtml;
+        String imgSrc;
+        while (mImgSrc.find()) {
+            imgHtml = mImgSrc.group(0);
+            imgSrc = mImgSrc.group(1);
+            result.add(new ImgTag(imgHtml, imgSrc));
         }
         return result;
     }
