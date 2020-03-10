@@ -114,11 +114,11 @@ public class MobiWriter implements Writer{
     }
 
     @Override
-    public void generate(Book book, String savePath) {
+    public void generate(Book book, String savePath) throws IOException {
         generateMobi(book, completingPath(savePath));
     }
 
-    public void generateMobi(Book book, String savePath) {
+    public void generateMobi(Book book, String savePath) throws IOException {
         //加载模板
         loadTemplates();
         //创建临时目录
@@ -289,7 +289,7 @@ public class MobiWriter implements Writer{
         CacheUtils.put(config.getToc());
     }
 
-    public void exec(Book book, String savePath) {
+    public void exec(Book book, String savePath) throws IOException {
         String cmdStr = String.format(PROCESS_CMD, kindlegenPath + getToolName(),
                 tempPath, endWithMobi(book.getName()));
         InputStream is = null;
@@ -312,6 +312,7 @@ public class MobiWriter implements Writer{
                     savePath + endWithMobi(book.getName()));
         } catch (IOException e) {
             log.error("exec error!", e);
+            throw e;
         } finally {
             IOUtils.close(br);
             IOUtils.close(isr);
