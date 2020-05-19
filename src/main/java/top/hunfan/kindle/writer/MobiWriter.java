@@ -40,6 +40,8 @@ public class MobiWriter implements Writer{
 
     private static final String MOBI_PREFIX = ".mobi";
 
+    private static final String JPG_PREFIX = ".jpg";
+
     private static final SimpleDateFormat format = new SimpleDateFormat("yyMMddHHmmss");
 
     private static final String IMAGES_DIR = "images"  + SeparatorUtils.getFileSeparator();
@@ -200,7 +202,8 @@ public class MobiWriter implements Writer{
         ImgTag imgTag;
         String src;
         String name;
-        for (int i = 0;i < srcList.size(); i++) {
+        int size = srcList.size();
+        for (int i = 0;i < size; i++) {
             imgTag = srcList.get(i);
             src = imgTag.getSrc();
             name = StringUtils.getFileName(src);
@@ -209,6 +212,8 @@ public class MobiWriter implements Writer{
                 content = content.replace(imgTag.getHtml(),"");
                 continue;
             }
+            name = StringUtils.isImage(name) ? name : name + JPG_PREFIX;
+
             try {
                 IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
             } catch (IOException e) {
@@ -216,6 +221,7 @@ public class MobiWriter implements Writer{
                 content = content.replace(src,"");
                 continue;
             }
+            log.debug("download images.{}/{}", i, size);
             content = content.replace(src, IMAGES_DIR + name);
         }
         return content;

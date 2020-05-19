@@ -73,6 +73,10 @@ public class StringUtils {
         return url;
     }
 
+    public static boolean isImage(String url){
+        return P_IMG_SUFFIX.matcher(url).matches();
+    }
+
     public static String filterContent(String content){
         if(paragraphed(content)){
             return content;
