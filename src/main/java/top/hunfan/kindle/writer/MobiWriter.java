@@ -212,7 +212,9 @@ public class MobiWriter implements Writer{
                 content = content.replace(imgTag.getHtml(),"");
                 continue;
             }
-            name = StringUtils.isImage(name) ? name : name + JPG_PREFIX;
+            if(!StringUtils.isImage(name)){
+                name += JPG_PREFIX;
+            }
 
             try {
                 IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
