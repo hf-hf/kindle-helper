@@ -98,6 +98,10 @@ public class MobiWriter implements Writer{
         return this;
     }
 
+    public String getTempPath() {
+        return tempPath;
+    }
+
     private String completingPath(String path){
         if(path.endsWith(SeparatorUtils.getFileSeparator())){
             return path;
@@ -187,14 +191,14 @@ public class MobiWriter implements Writer{
             String chapterContent = chapter.body;
             //如果不包含html，切分段落
             chapterContent = StringUtils.filterContent(chapterContent);
-            chapterContent = downloadChapterImages(chapterContent);
+            chapterContent = downloadChapterImages(chapterContent, chapter.getLocalImagesPath());
             content = content.replace("___CONTENT___", chapterContent);
             IOUtils.write(content, path);
         }
 
     }
 
-    private String downloadChapterImages(String content) {
+    private String downloadChapterImages(String content, String localImagesPath) {
         List<ImgTag> srcList = StringUtils.getImgTag(content);
         if(null == srcList || 0 > srcList.size()){
             return content;
@@ -216,14 +220,26 @@ public class MobiWriter implements Writer{
                 name += JPG_PREFIX;
             }
 
-            try {
-                IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
-            } catch (IOException e) {
-                log.error("downloadFile error! url:" + src, e);
-                content = content.replace(src,"");
-                continue;
+            if(null != localImagesPath){
+                try {
+                    IOUtils.copy(localImagesPath + name, this.tempImagesPath + name);
+                } catch (IOException e) {
+                    log.error("copy image error! url:" + localImagesPath + name, e);
+                    content = content.replace(src,"");
+                    continue;
+                }
+                log.debug("copy images.{}/{}", i, size);
+            } else {
+                try {
+                    IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
+                } catch (IOException e) {
+                    log.error("downloadFile error! url:" + src, e);
+                    content = content.replace(src,"");
+                    continue;
+                }
+                log.debug("download images.{}/{}", i, size);
             }
-            log.debug("download images.{}/{}", i, size);
+
             content = content.replace(src, IMAGES_DIR + name);
         }
         return content;
