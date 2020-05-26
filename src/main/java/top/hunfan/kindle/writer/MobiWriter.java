@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -316,20 +317,26 @@ public class MobiWriter implements Writer{
     public void exec(Book book, String savePath) throws IOException {
         String cmdStr = String.format(PROCESS_CMD, kindlegenPath + getToolName(),
                 tempPath, endWithMobi(book.getName()));
-        InputStream is = null;
-        BufferedReader br = null;
-        InputStreamReader isr = null;
-        String textLine = "";
+
+        Process process = Runtime.getRuntime().exec(cmdStr);
+
+        InputStream is = process.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        final BufferedReader br = new BufferedReader(isr);
+
+        InputStream isError = process.getErrorStream();
+        InputStreamReader isrError = new InputStreamReader(isError);
+        final BufferedReader brError = new BufferedReader(isrError);
+
         try {
-            Process process = Runtime.getRuntime().exec(cmdStr);
-            is = process.getInputStream();
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
-            while ((textLine = br.readLine()) != null) {
-                if(0 != textLine.length()){
-                    log.debug(textLine);
-                }
-            }
+            CompletableFuture<Void> inputFuture =
+                    CompletableFuture.runAsync(() -> printReadLine(br));
+
+            CompletableFuture<Void> errorFuture =
+                    CompletableFuture.runAsync(() -> printReadLine(brError));
+
+            CompletableFuture.allOf(inputFuture, errorFuture).join();
+
             log.debug("exec finish!");
             //移动生成的mobi到savePath
             IOUtils.copy(tempPath + endWithMobi(book.getName()),
@@ -341,6 +348,23 @@ public class MobiWriter implements Writer{
             IOUtils.close(br);
             IOUtils.close(isr);
             IOUtils.close(is);
+
+            IOUtils.close(brError);
+            IOUtils.close(isrError);
+            IOUtils.close(isError);
+        }
+    }
+
+    private void printReadLine(BufferedReader br){
+        String textLine = "";
+        try {
+            while ((textLine = br.readLine()) != null) {
+                if(0 != textLine.length()){
+                    log.debug(textLine);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 
