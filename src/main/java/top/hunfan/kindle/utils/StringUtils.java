@@ -18,7 +18,7 @@ public class StringUtils {
             Pattern.compile("<img\\b[^<>]*?\\bsrc[\\s\\t\\r\\n]*=[\\s\\t\\r\\n]*[\"\"']?[\\s\\t\\r\\n]*(?<imgUrl>[^\\s\\t\\r\\n\"\"'<>]*)[^<>]*?/?[\\s\\t\\r\\n]*>",
             Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern P_IMG_SUFFIX = Pattern.compile(".+(.JPEG|.jpeg|.JPG|.jpg|.png|.PNG)");
+    private static final Pattern P_IMG_SUFFIX = Pattern.compile(".+(\\.JPEG|\\.jpeg|\\.JPG|\\.jpg|\\.png|\\.PNG)");
 
     private static final Pattern P_P = Pattern.compile("<(P|p)+>");
 
