@@ -68,3 +68,6 @@ writer.generate(book, "D:\\tmp3");
     <version>0.0.5</version>
 </dependency>
 ```
+
+## v0.0.5更新
+优化显示样式，修复部分bug，下载文章内图片支持本地路径
