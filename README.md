@@ -65,6 +65,6 @@ writer.generate(book, "D:\\tmp3");
 <dependency>
     <groupId>top.hunfan</groupId>
     <artifactId>kindle-helper</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 </dependency>
 ```
