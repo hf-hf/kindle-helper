@@ -11,6 +11,8 @@ public class ChapterInfo {
 
     public String body;
 
+    public String localImagesPath;
+
     public String getTitle() {
         return title;
     }
@@ -25,5 +27,13 @@ public class ChapterInfo {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getLocalImagesPath() {
+        return localImagesPath;
+    }
+
+    public void setLocalImagesPath(String localImagesPath) {
+        this.localImagesPath = localImagesPath;
     }
 }

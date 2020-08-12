@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ public class MobiWriter implements Writer{
     private static final String PROCESS_CMD = "%s %scontent.opf -c1 -verbose -o %s";
 
     private static final String MOBI_PREFIX = ".mobi";
+
+    private static final String JPG_PREFIX = ".jpg";
 
     private static final SimpleDateFormat format = new SimpleDateFormat("yyMMddHHmmss");
 
@@ -96,6 +99,10 @@ public class MobiWriter implements Writer{
         return this;
     }
 
+    public String getTempPath() {
+        return tempPath;
+    }
+
     private String completingPath(String path){
         if(path.endsWith(SeparatorUtils.getFileSeparator())){
             return path;
@@ -114,11 +121,11 @@ public class MobiWriter implements Writer{
     }
 
     @Override
-    public void generate(Book book, String savePath) {
+    public void generate(Book book, String savePath) throws IOException {
         generateMobi(book, completingPath(savePath));
     }
 
-    public void generateMobi(Book book, String savePath) {
+    public void generateMobi(Book book, String savePath) throws IOException {
         //加载模板
         loadTemplates();
         //创建临时目录
@@ -185,14 +192,14 @@ public class MobiWriter implements Writer{
             String chapterContent = chapter.body;
             //如果不包含html，切分段落
             chapterContent = StringUtils.filterContent(chapterContent);
-            chapterContent = downloadChapterImages(chapterContent);
+            chapterContent = downloadChapterImages(chapterContent, chapter.getLocalImagesPath());
             content = content.replace("___CONTENT___", chapterContent);
             IOUtils.write(content, path);
         }
 
     }
 
-    private String downloadChapterImages(String content) {
+    private String downloadChapterImages(String content, String localImagesPath) {
         List<ImgTag> srcList = StringUtils.getImgTag(content);
         if(null == srcList || 0 > srcList.size()){
             return content;
@@ -200,7 +207,8 @@ public class MobiWriter implements Writer{
         ImgTag imgTag;
         String src;
         String name;
-        for (int i = 0;i < srcList.size(); i++) {
+        int size = srcList.size();
+        for (int i = 0;i < size; i++) {
             imgTag = srcList.get(i);
             src = imgTag.getSrc();
             name = StringUtils.getFileName(src);
@@ -209,13 +217,30 @@ public class MobiWriter implements Writer{
                 content = content.replace(imgTag.getHtml(),"");
                 continue;
             }
-            try {
-                IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
-            } catch (IOException e) {
-                log.error("downloadFile error! url:" + src, e);
-                content = content.replace(src,"");
-                continue;
+            if(!StringUtils.isImage(name)){
+                name += JPG_PREFIX;
             }
+
+            if(null != localImagesPath){
+                try {
+                    IOUtils.copy(localImagesPath + name, this.tempImagesPath + name);
+                } catch (IOException e) {
+                    log.error("copy image error! url:" + localImagesPath + name, e);
+                    content = content.replace(src,"");
+                    continue;
+                }
+                log.debug("copy images.{}/{}", i, size);
+            } else {
+                try {
+                    IOUtils.downloadFile(new URL(src), this.tempImagesPath + name);
+                } catch (IOException e) {
+                    log.error("downloadFile error! url:" + src, e);
+                    content = content.replace(src,"");
+                    continue;
+                }
+                log.debug("download images.{}/{}", i, size);
+            }
+
             content = content.replace(src, IMAGES_DIR + name);
         }
         return content;
@@ -289,33 +314,57 @@ public class MobiWriter implements Writer{
         CacheUtils.put(config.getToc());
     }
 
-    public void exec(Book book, String savePath) {
+    public void exec(Book book, String savePath) throws IOException {
         String cmdStr = String.format(PROCESS_CMD, kindlegenPath + getToolName(),
                 tempPath, endWithMobi(book.getName()));
-        InputStream is = null;
-        BufferedReader br = null;
-        InputStreamReader isr = null;
-        String textLine = "";
+
+        Process process = Runtime.getRuntime().exec(cmdStr);
+
+        InputStream is = process.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        final BufferedReader br = new BufferedReader(isr);
+
+        InputStream isError = process.getErrorStream();
+        InputStreamReader isrError = new InputStreamReader(isError);
+        final BufferedReader brError = new BufferedReader(isrError);
+
         try {
-            Process process = Runtime.getRuntime().exec(cmdStr);
-            is = process.getInputStream();
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
-            while ((textLine = br.readLine()) != null) {
-                if(0 != textLine.length()){
-                    log.debug(textLine);
-                }
-            }
+            CompletableFuture<Void> inputFuture =
+                    CompletableFuture.runAsync(() -> printReadLine(br));
+
+            CompletableFuture<Void> errorFuture =
+                    CompletableFuture.runAsync(() -> printReadLine(brError));
+
+            CompletableFuture.allOf(inputFuture, errorFuture).join();
+
             log.debug("exec finish!");
             //移动生成的mobi到savePath
             IOUtils.copy(tempPath + endWithMobi(book.getName()),
                     savePath + endWithMobi(book.getName()));
         } catch (IOException e) {
             log.error("exec error!", e);
+            throw e;
         } finally {
             IOUtils.close(br);
             IOUtils.close(isr);
             IOUtils.close(is);
+
+            IOUtils.close(brError);
+            IOUtils.close(isrError);
+            IOUtils.close(isError);
+        }
+    }
+
+    private void printReadLine(BufferedReader br){
+        String textLine = "";
+        try {
+            while ((textLine = br.readLine()) != null) {
+                if(0 != textLine.length()){
+                    log.debug(textLine);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 

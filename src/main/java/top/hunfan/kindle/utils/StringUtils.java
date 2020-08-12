@@ -18,9 +18,11 @@ public class StringUtils {
             Pattern.compile("<img\\b[^<>]*?\\bsrc[\\s\\t\\r\\n]*=[\\s\\t\\r\\n]*[\"\"']?[\\s\\t\\r\\n]*(?<imgUrl>[^\\s\\t\\r\\n\"\"'<>]*)[^<>]*?/?[\\s\\t\\r\\n]*>",
             Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern P_IMG_SUFFIX = Pattern.compile(".+(.JPEG|.jpeg|.JPG|.jpg|.png|.PNG)");
+    private static final Pattern P_IMG_SUFFIX = Pattern.compile(".+(\\.JPEG|\\.jpeg|\\.JPG|\\.jpg|\\.png|\\.PNG)");
 
     private static final Pattern P_P = Pattern.compile("<(P|p)+>");
+
+    private static final Pattern FILE_NAME_INVALID_PATTERN_WIN = Pattern.compile("[\\\\/:*?\"<>|]");
 
     public static boolean isBlank(CharSequence cs) {
         int strLen;
@@ -61,9 +63,17 @@ public class StringUtils {
     }
 
     public static String getFileName(String url) {
-        String src = filterImageUrl(url);
-        return src.substring(src.lastIndexOf("/") + 1, src.length());
+        String src = filterImageUrl(url)
+                .replaceAll("\\\\", "/");
+        int index = src.lastIndexOf("/");
+        String name = src.substring(index + 1, src.length());
+        if(containsInvalid(name)){
+            return getFileName(src.substring(0, index - 1));
+        }
+        return name;
     }
+
+
 
     public static String filterImageUrl(String url) {
         Matcher mImg = P_IMG_SUFFIX.matcher(url);
@@ -71,6 +81,10 @@ public class StringUtils {
             return mImg.group();
         }
         return url;
+    }
+
+    public static boolean isImage(String url){
+        return P_IMG_SUFFIX.matcher(url).matches();
     }
 
     public static String filterContent(String content){
@@ -96,6 +110,15 @@ public class StringUtils {
             chapterContent += pStr;
         }
         return chapterContent;
+    }
+
+    public static String cleanInvalid(String fileName) {
+        return isBlank(fileName)?
+                fileName : FILE_NAME_INVALID_PATTERN_WIN.matcher(fileName).replaceAll("");
+    }
+
+    public static boolean containsInvalid(String fileName) {
+        return !isBlank(fileName) && FILE_NAME_INVALID_PATTERN_WIN.matcher(fileName).find();
     }
 
 }

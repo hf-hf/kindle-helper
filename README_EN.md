@@ -63,6 +63,9 @@ Then add kindle-helper dependencies：
 <dependency>
     <groupId>top.hunfan</groupId>
     <artifactId>kindle-helper</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 </dependency>
 ```
+
+## Update of v0.0.5
+Optimize the display style, fix some bugs, download the pictures in the article, and support the local path

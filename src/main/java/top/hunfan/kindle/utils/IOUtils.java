@@ -31,6 +31,10 @@ public final class IOUtils {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
+	static {
+		HttpsUtils.doTrustAllHttpsCertificates();
+	}
+
 	private IOUtils() {
 	}
 
