@@ -11,6 +11,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,8 @@ public class MobiWriter implements Writer{
 
     private URL coverUrl;
 
+    private File coverFile;
+
     private String kindlegenPath = "." + SeparatorUtils.getFileSeparator()
             + "bin" + SeparatorUtils.getFileSeparator();
 
@@ -53,6 +56,10 @@ public class MobiWriter implements Writer{
 
     public MobiWriter(URL coverUrl) {
         this.coverUrl = coverUrl;
+    }
+
+    public MobiWriter(File coverFile) {
+        this.coverFile = coverFile;
     }
 
     public MobiWriter(String kindlegenPath) {
@@ -126,25 +133,33 @@ public class MobiWriter implements Writer{
     }
 
     private String createCoverImage(String content){
-        if(null == this.coverUrl){
+        if(null == this.coverUrl
+                && (null == this.coverFile && !this.coverFile.exists())){
             return content.replace("___BOOK_COVER___", "");
         }
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = this.coverUrl.openStream();
-            os = new FileOutputStream(new File(this.tempPath + "cover.jpg"));
+        String targetPath = this.tempPath + "cover.jpg";
+        if(null != this.coverFile){
+            try {
+                FileUtils.copyFile(this.coverFile, new File(targetPath));
+                content = content.replace("___BOOK_COVER___",
+                        "<img src=\"cover.jpg\" alt=\"cover\" style=\"height: 100%\"/>");
+                return content;
+            } catch (IOException e) {
+                log.error("copy cover image error!", e);
+                return content.replace("___BOOK_COVER___", "");
+            }
+        }
+        try(InputStream is = this.coverUrl.openStream();
+            OutputStream os = new FileOutputStream(new File(targetPath));) {
             IOUtils.write(is, os);
 
             content = content.replace("___BOOK_COVER___",
                     "<img src=\"cover.jpg\" alt=\"cover\" style=\"height: 100%\"/>");
-        } catch (Exception e){
-            log.error("create cover.jpg error!", e);
-        } finally {
-            IOUtils.close(is);
-            IOUtils.close(os);
+            return content;
+        } catch (IOException e){
+            log.error("create cover image error!", e);
+            return content.replace("___BOOK_COVER___", "");
         }
-        return content;
     }
 
 
