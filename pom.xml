@@ -11,7 +11,7 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.jdk>${java.version}</project.build.jdk>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <slf4j-api.version>1.7.25</slf4j-api.version>
     </properties>
 
